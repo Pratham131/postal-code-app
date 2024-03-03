@@ -17,7 +17,7 @@ function App() {
     setPincode(e.target.value);
     setError(null);
     setResponse([]);
-    setMessage("");
+    // setMessage("");
   };
 
   const handleFilter = (e) => {
@@ -31,13 +31,14 @@ function App() {
           `https://api.postalpincode.in/pincode/${pincode}`
         );
         const data = response.data;
-        // console.log(response.data)
+        console.log(response.data)
         // console.log(data[0].Status)
-        console.log(data[0].PostOffice);
+        // console.log(data[0].PostOffice);
+        // console.log(data[0].Message)
         if (data[0].Status === "Success") {
           setResponse(data);
-          setMessage(data[0].Message);
-          setSelectedPincode(pincode);
+          // setMessage(data[0].Message);
+          // setSelectedPincode(pincode);
           // console.log(data)
         } else {
           setError(data[0].Message);
@@ -52,12 +53,13 @@ function App() {
   };
 
   useEffect(() => {
-    const filteredResponse = response.filter((office) =>
-      office.Name.toLowerCase().includes(filter)
-    );
-    if (JSON.stringify(filteredResponse) !== JSON.stringify(response)) {
-      setResponse(filteredResponse);
-    }
+    const filteredResponse =
+      response.length > 0 && response[0].PostOffice
+        ? response[0].PostOffice.filter((office) =>
+            office.Name.toLowerCase().includes(filter)
+          )
+        : [];
+    setResponse([{ ...response[0], PostOffice: filteredResponse }]);
   }, [filter, response]);
 
   return (
@@ -100,10 +102,11 @@ function App() {
         </div> */}
 
 <div>
-          {response && (
+          { response.length > 0 && (
+            
             <div className="card-container">
               <h3>Pincode: {pincode}</h3>
-              {message && <p>Message: {message}</p>}
+              <p>Message: {response[0].Message}</p>
 
               <div>
                 <img src={myImage} />
@@ -115,7 +118,7 @@ function App() {
                 />
               </div>
 
-              {response.map((office) => (
+              {response[0].PostOffice.map((office) => (
                 <div className="office-card">
                   <h3>Name: {office.Name}</h3>
                   <p>Branch Type: {office.BranchType}</p>
@@ -127,6 +130,7 @@ function App() {
             </div>
           )}
         </div>
+        
       </div>
     </div>
   );
